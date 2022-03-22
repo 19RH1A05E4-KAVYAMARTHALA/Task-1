@@ -1,0 +1,84 @@
+package com.motivity;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
+
+public class MainMethod2 {
+	public static void main(String[] args){
+		StandardServiceRegistry ssr=new StandardServiceRegistryBuilder().configure("hib.xml").build();
+		Metadata meta=new MetadataSources(ssr).getMetadataBuilder().build();
+		SessionFactory factory=meta.getSessionFactoryBuilder().build();
+		Session session=factory.openSession();
+		Transaction t=session.beginTransaction();
+		
+		Employer empr1=new Employer();
+		empr1.setEmployer_id(100);
+		empr1.setEmployer_name("kavya");
+		empr1.setEmployer_mobile(1234556463);
+		empr1.setEmployer_department("HR");
+		
+		Employer empr2=new Employer();
+		empr2.setEmployer_id(101);
+		empr2.setEmployer_name("Bindu");
+		empr2.setEmployer_mobile(3435351334);
+		empr2.setEmployer_department("Finance");
+	
+		Employee emp1=new Employee();
+		emp1.setEmployee_id(105);
+		emp1.setEmployee_name("Sreeja");
+		emp1.setEmployee_mobile(2342353463);
+		emp1.setEmployee_address("Hyderabad");
+		emp1.setEmployer(empr1);
+		
+		Employee emp2=new Employee();
+		emp2.setEmployee_id(106);
+		emp2.setEmployee_name("Harsha");
+		emp2.setEmployee_mobile(1232423534);
+		emp2.setEmployee_address("Banglore");
+		emp2.setEmployer(empr2);
+		
+		Employee emp3=new Employee();
+		emp3.setEmployee_id(107);
+		emp3.setEmployee_name("Bhargavi");
+		emp3.setEmployee_mobile(21345663456);
+		emp3.setEmployee_address("Chennai");
+		emp3.setEmployer(empr1);
+	
+		List<Employee> al1=new ArrayList<Employee>();
+		al1.add(emp1);
+		
+		List<Employee> al2=new ArrayList<Employee>();
+		al2.add(emp2);
+	
+		List<Employee> al3=new ArrayList<Employee>();
+		al3.add(emp3);
+	
+		empr1.setEmployee(al1);
+		empr2.setEmployee(al2);
+		session.save(empr1);
+		session.save(empr2);
+		session.save(emp1);
+		session.save(emp2);
+		session.save(emp3);
+
+		Query qr=session.createQuery("select emp.employee_name,emp.employee_mobile,empr.employer_name from Employee emp INNER JOIN Employer empr on empr.employer_id=emp.employer ");
+		List li=qr.list();
+		Iterator it=li.iterator();
+		while(it.hasNext()) {
+			Object obj[]=(Object[])it.next();
+			System.out.println(obj[0]+" "+obj[1]+" "+obj[2]);
+		}
+		t.commit();
+		session.close();
+	}
+
+}
